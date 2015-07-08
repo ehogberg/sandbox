@@ -61,6 +61,20 @@
                   (-> dst OutputStreamWriter. BufferedWriter.))})
 
 
+(deftype CryptoVault [filename keystore password])
+
+(def vault (->CryptoVault "vault-file" "keystore" "toomanysecrets"))
+
+(.filename vault)
+
+
+(defprotocol Vault
+  (init-vault [vault])
+  (vault-output-stream [vault])
+  (vault-input-stream [vault]))
+
+
+
 
 
 
