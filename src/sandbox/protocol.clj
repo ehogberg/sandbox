@@ -8,11 +8,6 @@
   (make-reader [this] "Creates a BufferedReader")
   (make-writer [this] "Creates a BufferedWriter"))
 
-(defn make-reader [src]
-  (-> src FileInputStream. InputStreamReader. BufferedReader.))
-
-(defn make-writer [dst]
-  (-> dst FileOutputStream. OutputStreamWriter. BufferedWriter.))
 
 (defn gulp [src]
   (let [sb (StringBuilder.)]
@@ -22,7 +17,7 @@
           (str sb)
           (do
             (.append sb (char c))
-            (recur (.read reader)))))))) 
+            (recur (.read reader))))))))
 
 (defn expectorate [dst content]
   (with-open [writer (make-writer dst)]
