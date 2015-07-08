@@ -1,10 +1,12 @@
 (ns sandbox.protocol
-  (:import (java.io FileInputStream InputStreamReader BufferedReader
+  (:import (java.io InputStream OutputStream
+                    FileInputStream InputStreamReader BufferedReader
                     FileOutputStream OutputStreamWriter BufferedWriter)))
 
-(definterface IOFactory
-  (^java.io.BufferedReader make_reader [this])
-  (^java.io.BufferedWriter make_writer [this]))
+(defprotocol IOFactory
+  "A protocol for things that can be read from and written to."
+  (make-reader [this] "Creates a BufferedReader")
+  (make-writer [this] "Creates a BufferedWriter"))
 
 (defn make-reader [src]
   (-> src FileInputStream. InputStreamReader. BufferedReader.))
@@ -25,6 +27,21 @@
 (defn expectorate [dst content]
   (with-open [writer (make-writer dst)]
     (.write writer (str content))))
+
+(extend InputStream
+  IOFactory
+  {:make-reader (fn [src]
+                  (-> src InputStreamReader. BufferedReader.))
+   :make-writer (fn [dst]
+                  (throw (IllegalArgumentException.
+                          "Can't open as an InputStream")))})
+
+(extend OutputStream
+  IOFactory
+  {:make-reader (fn [src] (throw (IllegalArgumentException.
+                                  "Can't open as an OutputStream.")))
+   :make-writer (fn [dst]
+                  (-> dst OutputStreamWriter. BufferedWriter.))})
 
 
 
